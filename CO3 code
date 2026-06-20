@@ -1,0 +1,74 @@
+import java.util.*;
+
+public class MicroserviceDFS {
+
+    static Map<String, List<String>> graph = new HashMap<>();
+    static Set<String> visited = new HashSet<>();
+
+    static List<String> entryOrder = new ArrayList<>();
+    static List<String> finishOrder = new ArrayList<>();
+
+    static void addEdge(String u, String v) {
+        graph.computeIfAbsent(u, k -> new ArrayList<>()).add(v);
+    }
+
+    static void dfs(String node) {
+
+        visited.add(node);
+        entryOrder.add(node);
+
+        List<String> neighbors = graph.getOrDefault(node, new ArrayList<>());
+
+        // Alphabetical Neighbor Order
+        Collections.sort(neighbors);
+
+        for (String next : neighbors) {
+            if (!visited.contains(next)) {
+                dfs(next);
+            }
+        }
+
+        finishOrder.add(node);
+    }
+
+    public static void main(String[] args) {
+
+        addEdge("api", "auth");
+        addEdge("api", "catalog");
+        addEdge("api", "cart");
+
+        addEdge("auth", "analytics");
+
+        addEdge("catalog", "inventory");
+
+        addEdge("cart", "inventory");
+        addEdge("cart", "payment");
+
+        addEdge("payment", "analytics");
+        addEdge("payment", "notif");
+        addEdge("payment", "ship");
+
+        addEdge("ship", "inventory");
+        addEdge("ship", "notif");
+
+        dfs("api");
+
+        System.out.println("DFS Entry Order:");
+        System.out.println(entryOrder);
+
+        System.out.println("\nDFS Finish Order (Post Order):");
+        System.out.println(finishOrder);
+
+        System.out.println("\nDownstream Services of API:");
+        Set<String> downstream = new LinkedHashSet<>(entryOrder);
+        downstream.remove("api");
+        System.out.println(downstream);
+
+        int V = 9;
+        int E = 12;
+
+        System.out.println("\nTime Complexity = O(V + E)");
+        System.out.println("For V = " + V + " and E = " + E +
+                           ", Complexity = O(" + (V + E) + ")");
+    }
+}

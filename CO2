@@ -1,0 +1,64 @@
+import java.util.*;
+
+class Block {
+    long minTimestamp;
+    long maxTimestamp;
+
+    Block(long min, long max) {
+        minTimestamp = min;
+        maxTimestamp = max;
+    }
+
+    boolean overlaps(long queryMin, long queryMax) {
+        return !(maxTimestamp < queryMin || minTimestamp > queryMax);
+    }
+}
+
+public class ZoneMapDemo {
+
+    static final int TOTAL_BLOCKS = 100000;
+
+    public static void main(String[] args) {
+
+        ArrayList<Block> zoneMap = new ArrayList<>();
+
+        long start = 1;
+
+        // Create zone map
+        for (int i = 0; i < TOTAL_BLOCKS; i++) {
+
+            long min = start;
+            long max = start + 9999;
+
+            zoneMap.add(new Block(min, max));
+
+            start += 10000;
+        }
+
+        // Query range
+        long queryMin = 200000000;
+        long queryMax = 210000000;
+
+        int blocksRead = 0;
+
+        for (Block block : zoneMap) {
+
+            if (block.overlaps(queryMin, queryMax)) {
+                blocksRead++;
+            }
+        }
+
+        System.out.println("Total Blocks : " + TOTAL_BLOCKS);
+
+        System.out.println("Blocks Read Using Zone Map : "
+                + blocksRead);
+
+        long storageCost = TOTAL_BLOCKS * 16L;
+
+        System.out.println("Zone Map Storage Cost = "
+                + storageCost + " Bytes");
+
+        System.out.println("Storage Cost = "
+                + (storageCost / 1000000.0) + " MB");
+    }
+}
